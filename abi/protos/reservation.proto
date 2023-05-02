@@ -1,0 +1,99 @@
+syntax = "proto3";
+package reservation;
+
+import "google/protobuf/timestamp.proto";
+
+enum ReserveStatus {
+    RESERVE_STATUS_UNKNOWN = 0;
+    RESERVE_STATUS_PENDING = 1;
+    RESERVE_STATUS_CONFIRMED = 2;
+    RESERVE_STATUS_BLOCKED = 3;
+}
+
+enum ReserveChangeType {
+    RESERVE_CHANGE_TYPE_UNKNOWN = 0;
+    RESERVE_CHANGE_TYPE_CREATE = 1;
+    RESERVE_CHANGE_TYPE_UPDATE = 2;
+    RESERVE_CHANGE_TYPE_DELETE = 3;
+}
+
+message Reservation {
+    string id = 1;
+    string user_id = 2;
+    ReserveStatus status = 3;
+    // resourse
+    string resourse_id = 4;
+    google.protobuf.Timestamp start = 5;
+    google.protobuf.Timestamp end = 6;
+    string notes = 7;
+}
+
+message ReserveRequest {
+    Reservation reservation = 1;
+}
+
+message ReserveResponse {
+    Reservation reservation = 1;
+}
+
+message UpdateRequest {
+    string notes = 1;
+}
+
+
+message UpdateResponse {
+    Reservation reservation = 1;
+}
+
+message CancelRequest {
+    string id = 1;
+}
+
+message CancelResponse {
+    Reservation reservation = 1;
+}
+
+message ConfirmRequest {
+    string id = 1;
+}
+
+message ConfirmResponse {
+    Reservation reservation = 1;
+}
+
+message GetRequest {
+    string id = 1;
+}
+
+message GetResponse {
+    Reservation reservation = 1;
+}
+
+
+message QueryRequest {
+    string resoure_id = 1;
+    string user_id = 2;
+    // status is to filter, default UNKNOWN
+    ReserveStatus status = 3;
+    google.protobuf.Timestamp start = 4;
+    google.protobuf.Timestamp end = 5;
+}
+
+message ListenRequest{}
+
+message ListenResponse {
+    ReserveChangeType op = 1;
+    Reservation reservation = 2;
+}
+
+service ReservationService {
+    rpc reserve(ReserveRequest) returns (ReserveResponse);
+    rpc confirm(ConfirmRequest) returns(ConfirmResponse);
+    rpc update(UpdateRequest) returns (UpdateResponse);
+    rpc cancel(CancelRequest) returns(CancelResponse);
+    rpc get(GetRequest) returns(GetResponse);
+    rpc query(QueryRequest) returns(stream Reservation);
+    rpc listen(ListenRequest) returns(ListenResponse);
+}
+
+
